@@ -2,10 +2,14 @@
 
 
 // create an array with nodes
-var nodes = new vis.DataSet([]);
+var nodes = new vis.DataSet([
+		{id: 1, label: "1"},{id: 2, label: "2"},{id: 3, label: "3"},{id: 4, label: "4"}
+	]);
 
 // create an array with edges
-var edges = new vis.DataSet([]);
+var edges = new vis.DataSet([
+		{from: 1, to: 2},{from: 2, to: 3},{from: 3, to: 4}
+	]);
 
 // create a network
 var container = document.getElementById('mynetwork');
@@ -29,57 +33,28 @@ var network = new vis.Network(container, data, options);
 this.nbVisitedNodes = 0;
 this.adjMat = null;
 this.nbNodes = 0;
+this.articulationPoints = [];
+this.nbArticulationPoints = 0;
 
 
 
 /* --------------- Funtions -------------- */
 
-function createAdjMat() {
-    var nbNodes = nodes.length;
-    var mat = create2Darray(nbNodes);
-    var nbEdges;
-
-    for (var i = 0; i < nbNodes; i++) {
-        for (var j = 0; j < nbNodes; j++) {
-            nbEdges = numberOfEdgesBetweenNodes(i+1, j+1);
-            if (nbEdges != 0) nbEdges = 1;
-            mat[i][j] = nbEdges;
-        }
-    }
-
-    return mat;
-};
-
-
-function create2Darray(n) {
-    arr = [];
-
-    for (var i = 0; i < n; i++) {
-        arr[i] = [];
-    }
-
-    return arr;
-}
-
-
-function numberOfEdgesBetweenNodes(node1,node2) {
-    return edges.get().filter(function (edge) {
-        return (edge.from === node1 && edge.to === node2 )|| (edge.from === node2 && edge.to === node1);
-    }).length;
-};
-
 
 function displayArticulationPoints() { 
-    var articulationPoints = findArticulationPoints();
-    var nbArticulationPoints = articulationPoints.length;
+
+	uncolorAllNodes();
+    articulationPoints = findArticulationPoints();
+    nbArticulationPoints = articulationPoints.length;
+    
     var displayString = "There is " + nbArticulationPoints + " articulation point";
- 
+
     for (var i = 0; i < nbArticulationPoints; i++)
-        colorifyNode(articulationPoints[i]);        
+        colorNode(articulationPoints[i]);        
 
     if (nbArticulationPoints > 1) {
-        displayString.replace("is", "are");
-        displayString.concat("s");
+        displayString = displayString.replace('is', 'are');
+        displayString = displayString.concat("s");
     }
 
     document.getElementById("result").innerHTML = displayString;
@@ -102,6 +77,22 @@ function findArticulationPoints() {
     return articulationPoints;
 }
 
+function createAdjMat() {
+    var nbNodes = nodes.length;
+    var mat = create2DArray(nbNodes);
+    var nbEdges;
+
+    for (var i = 0; i < nbNodes; i++) {
+        for (var j = 0; j < nbNodes; j++) {
+            nbEdges = numberOfEdgesBetweenNodes(i+1, j+1);
+            if (nbEdges != 0) nbEdges = 1;
+            mat[i][j] = nbEdges;
+        }
+    }
+
+    return mat;
+};
+
 
 function isArticulationPoint(i) {
     this.nbVisitedNodes = 0;
@@ -119,7 +110,7 @@ function isArticulationPoint(i) {
 };
 
 
-function colorifyNode(i) {
+function colorNode(i) {
     var nodeToBeColored = nodes.get(i);
 
     nodeToBeColored.color = {
@@ -127,7 +118,7 @@ function colorifyNode(i) {
         background: '#fff000',
         highlight: {
             border: '#ffe000',
-            background: '##ffff00'
+            background: '#ffff00'
         },
         hover: {
             border: '#ffe000',
@@ -137,6 +128,31 @@ function colorifyNode(i) {
     nodes.update(nodeToBeColored);
 }
 
+
+function uncolorAllNodes() {
+	for (var i = 0; i < nbNodes; i++) {
+		uncolorNode(i+1);
+	}
+}
+
+
+function uncolorNode(i) {
+    var nodeToBeUncolored = nodes.get(i);
+
+    nodeToBeUncolored.color = {
+        border: '#2B7CE9',
+        background: '#97C2FC',
+        highlight: {
+          border: '#2B7CE9',
+          background: '#D2E5FF'
+        },
+        hover: {
+          border: '#2B7CE9',
+          background: '#D2E5FF'
+        }
+    }
+    nodes.update(nodeToBeUncolored);
+}
 
 
 function DFS(i) {
@@ -202,4 +218,25 @@ function DFSwithout(i, m) {
         }
         ;
     }
+};
+
+
+
+/* ----------------- Helper Functions ----------------*/
+
+function create2DArray(n) {
+    arr = [];
+
+    for (var i = 0; i < n; i++) {
+        arr[i] = [];
+    }
+
+    return arr;
+}
+
+
+function numberOfEdgesBetweenNodes(node1,node2) {
+    return edges.get().filter(function (edge) {
+        return (edge.from === node1 && edge.to === node2 )|| (edge.from === node2 && edge.to === node1);
+    }).length;
 };
