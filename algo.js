@@ -3,12 +3,14 @@
 
 // create an array with nodes
 var nodes = new vis.DataSet([
-		{id: 1, label: "1"},{id: 2, label: "2"},{id: 3, label: "3"},{id: 4, label: "4"}
+		// Uncomment bellow for testing purposes
+		// {id: 1, label: "1"},{id: 2, label: "2"},{id: 3, label: "3"},{id: 4, label: "4"}
 	]);
 
 // create an array with edges
 var edges = new vis.DataSet([
-		{from: 1, to: 2},{from: 2, to: 3},{from: 3, to: 4}
+		// Uncomment bellow for testing purposes
+		// {from: 1, to: 2},{from: 2, to: 3},{from: 3, to: 4}
 	]);
 
 // create a network
@@ -47,14 +49,14 @@ function displayArticulationPoints() {
     articulationPoints = findArticulationPoints();
     nbArticulationPoints = articulationPoints.length;
     
-    var displayString = "There is " + nbArticulationPoints + " articulation point";
+    var displayString = "There are " + nbArticulationPoints + " articulation points";
 
     for (var i = 0; i < nbArticulationPoints; i++)
         colorNode(articulationPoints[i]);        
 
-    if (nbArticulationPoints > 1) {
-        displayString = displayString.replace('is', 'are');
-        displayString = displayString.concat("s");
+    if (nbArticulationPoints == 1) {
+        displayString = displayString.replace('are', 'is');
+        displayString = displayString.replace('points', 'point');
     }
 
     document.getElementById("result").innerHTML = displayString;
